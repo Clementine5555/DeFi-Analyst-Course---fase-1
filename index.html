@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fase 1 — AI for DeFi Research & Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;0,700;1,300&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f8ff;
+    --white: #ffffff;
+    --blue-50: #eff6ff;
+    --blue-100: #dbeafe;
+    --blue-200: #bfdbfe;
+    --blue-400: #60a5fa;
+    --blue-500: #3b82f6;
+    --blue-600: #2563eb;
+    --blue-700: #1d4ed8;
+    --sky: #0ea5e9;
+    --navy: #0f172a;
+    --slate: #334155;
+    --muted: #64748b;
+    --light: #94a3b8;
+    --border: #e2e8f0;
+    --border2: #cbd5e1;
+    --green: #10b981;
+    --green-bg: #ecfdf5;
+    --amber: #f59e0b;
+    --amber-bg: #fffbeb;
+    --red: #ef4444;
+    --red-bg: #fef2f2;
+    --sans: 'DM Sans', sans-serif;
+    --serif: 'Fraunces', serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--navy);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle, #93c5fd 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.18;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .hero {
+    position: relative;
+    background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 60%, #0ea5e9 100%);
+    padding: 72px 24px 80px;
+    text-align: center;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0; right: 0;
+    height: 60px;
+    background: var(--bg);
+    clip-path: ellipse(55% 100% at 50% 100%);
+  }
+
+  .hero-eyebrow {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+
+  .hero h1 em { font-style: italic; font-weight: 300; color: #bae6fd; }
+
+  .hero-desc {
+    font-size: 15px;
+    color: rgba(255,255,255,0.8);
+    max-width: 540px;
+    margin: 0 auto 32px;
+    font-weight: 300;
+  }
+
+  .hero-pills {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .pill {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    font-size: 12px;
+    font-family: var(--mono);
+    padding: 5px 14px;
+    border-radius: 20px;
+  }
+
+  .toc-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 0 16px;
+  }
+
+  .toc-inner {
+    display: flex;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .toc-btn {
+    background: none;
+    border: none;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    padding: 13px 14px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .toc-btn:hover, .toc-btn.active {
+    color: var(--blue-600);
+    border-bottom-color: var(--blue-500);
+  }
+
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 20px 100px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .chapter { margin-top: 64px; }
+
+  .chapter-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .chapter-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--blue-500);
+    background: var(--blue-50);
+    border: 1px solid var(--blue-200);
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+  }
+
+  .chapter-line { flex: 1; height: 1px; background: var(--border); }
+
+  .chapter h2 {
+    font-family: var(--serif);
+    font-size: clamp(22px, 4vw, 32px);
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+
+  .chapter-sub {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 28px;
+    font-weight: 300;
+  }
+
+  .prose { font-size: 15px; color: var(--slate); line-height: 1.8; }
+  .prose p { margin-bottom: 18px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--navy); font-weight: 600; }
+  .prose em { color: var(--blue-600); font-style: normal; font-weight: 500; }
+
+  .section-title {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 36px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--blue-100);
+  }
+
+  .box {
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin: 20px 0;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .box-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .box-analogy { background: var(--blue-50); border: 1px solid var(--blue-200); border-left: 4px solid var(--blue-500); }
+  .box-analogy .box-label { color: var(--blue-600); }
+
+  .box-example { background: #f0fdf4; border: 1px solid #bbf7d0; border-left: 4px solid var(--green); }
+  .box-example .box-label { color: var(--green); }
+
+  .box-warning { background: var(--red-bg); border: 1px solid #fecaca; border-left: 4px solid var(--red); }
+  .box-warning .box-label { color: var(--red); }
+
+  .box-tip { background: var(--amber-bg); border: 1px solid #fde68a; border-left: 4px solid var(--amber); }
+  .box-tip .box-label { color: #92400e; }
+
+  /* PROMPT BLOCK */
+  .prompt-block {
+    background: #0f172a;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 20px 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  }
+
+  .prompt-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .prompt-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: #60a5fa;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .prompt-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: #4ade80;
+    background: rgba(74,222,128,0.1);
+    border: 1px solid rgba(74,222,128,0.2);
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+
+  .prompt-body {
+    padding: 16px 18px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: #e2e8f0;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .prompt-body .ph {
+    color: #f59e0b;
+    font-style: italic;
+  }
+
+  /* FRAMEWORK TABLE */
+  .fw-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13px;
+    background: var(--white);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .fw-table th {
+    background: var(--blue-600);
+    color: #fff;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 12px;
+  }
+
+  .fw-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--slate);
+    vertical-align: top;
+  }
+
+  .fw-table tr:last-child td { border-bottom: none; }
+  .fw-table tr:nth-child(even) td { background: var(--blue-50); }
+  .fw-table td:first-child { font-family: var(--mono); font-size: 12px; color: var(--blue-600); font-weight: 500; width: 30%; }
+
+  /* TERM GRID */
+  .term-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 16px 0;
+  }
+
+  @media (max-width: 560px) { .term-grid { grid-template-columns: 1fr; } }
+
+  .term-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .term-card:hover {
+    border-color: var(--blue-400);
+    box-shadow: 0 2px 12px rgba(59,130,246,0.1);
+  }
+
+  .term-name { font-family: var(--mono); font-size: 12px; color: var(--blue-600); font-weight: 500; margin-bottom: 5px; }
+  .term-def { font-size: 13px; color: var(--slate); line-height: 1.5; }
+
+  /* STEP LIST */
+  .step-list { list-style: none; margin: 16px 0; }
+  .step-list li {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--slate);
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-num {
+    width: 26px; height: 26px;
+    background: var(--blue-600);
+    color: #fff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600;
+    flex-shrink: 0; margin-top: 1px;
+  }
+
+  /* COMPARE */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+  @media (max-width: 560px) { .compare { grid-template-columns: 1fr; } }
+
+  .compare-card { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+  .compare-card h4 {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--blue-100);
+    color: var(--blue-700);
+  }
+  .compare-card ul { list-style: none; }
+  .compare-card ul li {
+    font-size: 13px; color: var(--slate); padding: 4px 0;
+    display: flex; gap: 8px; align-items: flex-start;
+  }
+  .compare-card ul li::before { content: '→'; color: var(--blue-400); flex-shrink: 0; font-size: 12px; margin-top: 1px; }
+
+  /* SCORING TABLE */
+  .score-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 16px 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .score-header {
+    background: var(--blue-600);
+    padding: 12px 18px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .score-header span { font-family: var(--mono); font-size: 11px; opacity: 0.8; }
+
+  .score-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+    font-size: 13px;
+  }
+
+  .score-row:last-child { border-bottom: none; }
+
+  .score-param { flex: 1; color: var(--slate); }
+  .score-weight { font-family: var(--mono); font-size: 11px; color: var(--muted); width: 40px; text-align: center; }
+  .score-bar-wrap { width: 100px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .score-bar { height: 100%; border-radius: 3px; }
+  .bar-green { background: var(--green); }
+  .bar-yellow { background: var(--amber); }
+  .bar-red { background: var(--red); }
+
+  /* DIVIDER */
+  .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--blue-200), transparent); margin: 48px 0; }
+
+  /* RECAP */
+  .recap {
+    background: linear-gradient(135deg, #0f172a, #1d4ed8);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 40px 0 0;
+    color: #fff;
+  }
+  .recap h3 { font-family: var(--serif); font-size: 20px; font-weight: 600; margin-bottom: 14px; }
+  .recap ul { list-style: none; }
+  .recap ul li {
+    font-size: 14px; padding: 5px 0;
+    color: rgba(255,255,255,0.9);
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .recap ul li::before { content: '✓'; color: #86efac; flex-shrink: 0; font-weight: 700; }
+
+  /* NEXT */
+  .next-card {
+    background: var(--white);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .next-card .label { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; margin-bottom: 4px; }
+  .next-card .title { font-size: 15px; font-weight: 600; color: var(--navy); }
+  .next-card .arrow { font-size: 22px; color: var(--blue-400); flex-shrink: 0; }
+
+  footer {
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    padding: 32px 24px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+  footer p { font-size: 12px; color: var(--muted); }
+  footer strong { color: var(--blue-600); font-family: var(--mono); }
+
+  .fade-up { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 640px) {
+    .hero { padding: 48px 16px 64px; }
+    .page { padding: 0 14px 80px; }
+    .chapter { margin-top: 48px; }
+    .prose { font-size: 14px; }
+    .section-title { font-size: 18px; }
+    .box { padding: 14px 16px; font-size: 13px; }
+    .prompt-body { font-size: 12px; padding: 14px 14px; }
+    .fw-table th, .fw-table td { padding: 8px 10px; font-size: 12px; }
+    .recap { padding: 18px 18px; }
+    .score-bar-wrap { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-eyebrow">AI-Powered DeFi Analyst Course</div>
+  <h1>Fase 1 — <em>AI for DeFi Research</em></h1>
+  <p class="hero-desc">Cara pakai AI secara sistematis untuk riset protokol, analisis tokenomics, dan identifikasi risiko — bukan sekadar tanya-jawab biasa.</p>
+  <div class="hero-pills">
+    <div class="pill">7 Topik</div>
+    <div class="pill">2–3 Bulan</div>
+    <div class="pill">Fase Kedua</div>
+  </div>
+</div>
+
+<nav class="toc-nav">
+  <div class="toc-inner">
+    <button class="toc-btn active" onclick="navTo('mindset')">Mindset</button>
+    <button class="toc-btn" onclick="navTo('prompt')">Prompt Engineering</button>
+    <button class="toc-btn" onclick="navTo('protokol')">Riset Protokol</button>
+    <button class="toc-btn" onclick="navTo('tokenomics')">Tokenomics</button>
+    <button class="toc-btn" onclick="navTo('risk')">Risk Assessment</button>
+    <button class="toc-btn" onclick="navTo('onchain')">On-Chain Basics</button>
+    <button class="toc-btn" onclick="navTo('output')">Output & Format</button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- CHAPTER 1: MINDSET                 -->
+  <!-- ═══════════════════════════════════ -->
+  <div id="mindset" class="chapter fade-up">
+    <div class="chapter-label">
+      <span class="chapter-num">01</span>
+      <div class="chapter-line"></div>
+    </div>
+    <h2>Mindset yang Benar Dulu</h2>
+    <p class="chapter-sub">AI itu partner riset, bukan mesin jawab otomatis</p>
+
+    <div class="prose">
+      <p>Banyak orang pakai AI untuk DeFi research dengan cara yang salah — mereka tanya "apakah protokol X aman?" dan percaya begitu saja sama jawabannya. Itu berbahaya.</p>
+      <p>AI seperti Claude punya batasan yang harus kamu pahami dari awal supaya kamu bisa pakainya dengan benar:</p>
+    </div>
+
+    <div class="compare">
+      <div class="compare-card">
+        <h4>Yang AI Bisa Lakukan dengan Baik</h4>
+        <ul>
+          <li>Jelaskan mekanisme protokol yang kompleks</li>
+          <li>Bantu struktur framework analisis</li>
+          <li>Interpretasi data yang sudah kamu kasih</li>
+          <li>Draft riset report dari poin-poin kamu</li>
+          <li>Bandingkan dua protokol secara konseptual</li>
+          <li>Identifikasi pertanyaan yang perlu kamu cari tahu</li>
+        </ul>
+      </div>
+      <div class="compare-card">
+        <h4>Yang AI Tidak Bisa Dipercaya</h4>
+        <ul>
+          <li>Data angka real-time (TVL, harga, APY)</li>
+          <li>Konfirmasi apakah kode sudah diaudit</li>
+          <li>Status protokol saat ini (masih berjalan atau tidak)</li>
+          <li>Prediksi harga token</li>
+          <li>Informasi yang berubah cepat post-cutoff</li>
+          <li>Keputusan investasi final</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="box box-analogy">
+      <span class="box-label">Cara Tepat Memandang AI</span>
+      Anggap AI sebagai junior analyst yang sangat pintar tapi belum pernah akses internet sejak bulan tertentu. Dia bisa bantu kamu berpikir, struktur argumen, dan draft laporan — tapi kamu yang harus verifikasi semua angka dan fakta terkini ke sumber primer: DeFiLlama, Dune, dan dokumentasi protokol.
+    </div>
+
+    <div class="section-title">Workflow yang Benar</div>
+
+    <ul class="step-list">
+      <li><div class="step-num">1</div><div><strong>Kamu cari data</strong> dari sumber primer — DeFiLlama, Dune, Token Terminal, dokumentasi protokol.</div></li>
+      <li><div class="step-num">2</div><div><strong>AI bantu interpretasi</strong> — kamu paste data ke AI, minta AI bantu analisis apa artinya.</div></li>
+      <li><div class="step-num">3</div><div><strong>Kamu verifikasi</strong> — kalau AI ngomong sesuatu yang kamu nggak familiar, cek ke sumber aslinya.</div></li>
+      <li><div class="step-num">4</div><div><strong>AI bantu draft</strong> — dari poin-poin yang sudah kamu kumpulkan, AI bantu tulis jadi laporan yang readable.</div></li>
+      <li><div class="step-num">5</div><div><strong>Kamu edit dan publish</strong> — sentuhan akhir, judgment, dan opini tetap dari kamu, bukan AI.</div></li>
+    </ul>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- CHAPTER 2: PROMPT ENGINEERING      -->
+  <!-- ═══════════════════════════════════ -->
+  <div id="prompt" class="chapter fade-up">
+    <div class="chapter-label">
+      <span class="chapter-num">02</span>
+      <div class="chapter-line"></div>
+    </div>
+    <h2>Prompt Engineering untuk DeFi</h2>
+    <p class="chapter-sub">Cara ngomong ke AI supaya hasilnya jauh lebih berguna</p>
+
+    <div class="prose">
+      <p>Kualitas output AI sangat bergantung pada kualitas input kamu. Prompt yang buruk dapat hasil yang buruk, walaupun modelnya canggih. Ini bukan soal "magic words" — ini soal bagaimana kamu mengkomunikasikan konteks, tujuan, dan format yang kamu mau.</p>
+    </div>
+
+    <div class="section-title">Teknik 1 — Kasih Konteks dan Peran</div>
+
+    <div class="prose">
+      <p>Daripada langsung tanya, kasih dulu AI konteks siapa dia dan apa tujuannya. Ini namanya <em>role prompting</em>.</p>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-header">
+        <span class="prompt-label">Prompt Buruk</span>
+        <span class="prompt-tag">❌ Hindari</span>
+      </div>
+      <div class="prompt-body">Jelaskan Aave.</div>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-header">
+        <span class="prompt-label">Prompt Baik</span>
+        <span class="prompt-tag">✓ Gunakan</span>
+      </div>
+      <div class="prompt-body">Kamu adalah DeFi analyst senior. Jelaskan mekanisme Aave v3 dari perspektif seorang analis risiko — fokus pada bagaimana protokol ini mengelola risiko likuidasi, apa perbedaan utamanya dengan Aave v2, dan apa kelemahan struktural yang perlu diwaspadai investor.</div>
+    </div>
+
+    <div class="section-title">Teknik 2 — Structured Output</div>
+
+    <div class="prose">
+      <p>Minta AI output dalam format tertentu supaya hasilnya langsung bisa dipakai, bukan prose panjang yang harus kamu olah lagi.</p>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-header">
+        <span class="prompt-label">Contoh Prompt</span>
+        <span class="prompt-tag">Template</span>
+      </div>
+      <div class="prompt-body">Analisis protokol <span class="ph">[nama protokol]</span> dan berikan output dalam format berikut:
+
+**RINGKASAN** (2-3 kalimat, apa protokolnya dan apa fungsinya)
+
+**MEKANISME UTAMA** (poin-poin, bagaimana protokol ini bekerja)
+
+**VALUE PROPOSITION** (kenapa orang mau pakai ini dibanding alternatif)
+
+**RISIKO UTAMA** (minimal 3 risiko spesifik, bukan generic)
+
+**PERTANYAAN YANG BELUM TERJAWAB** (hal apa yang perlu saya cari tahu lebih lanjut ke sumber primer)</div>
+    </div>
+
+    <div class="section-title">Teknik 3 — Chain of Thought</div>
+
+    <div class="prose">
+      <p>Untuk analisis yang kompleks, minta AI berpikir step by step sebelum kasih kesimpulan. Ini mengurangi hallucination karena AI "terpaksa" nunjukin reasoning-nya.</p>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-header">
+        <span class="prompt-label">Contoh Prompt</span>
+        <span class="prompt-tag">Template</span>
+      </div>
+      <div class="prompt-body">Sebelum menjawab, pikirkan step by step:
+
+1. Apa mekanisme utama protokol ini?
+2. Dari mekanisme itu, risiko apa yang paling logis muncul?
+3. Ada preseden historis protokol sejenis yang kena exploit?
+4. Baru setelah itu berikan analisis risikomu.
+
+Protokol yang dianalisis: <span class="ph">[nama protokol]</span></div>
+    </div>
+
+    <div class="section-title">Teknik 4 — Iterasi dan Push Back</div>
+
+    <div class="prose">
+      <p>Jangan puas dengan jawaban pertama. AI cenderung kasih jawaban yang "aman" dan balanced di awal. Push dia untuk lebih spesifik.</p>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-header">
+        <span class="prompt-label">Follow-up Prompts yang Efektif</span>
+        <span class="prompt-tag">Template</span>
+      </div>
+      <div class="prompt-body">"Jawaban kamu terlalu general. Sebutkan risiko yang SPESIFIK untuk protokol ini, bukan risiko DeFi secara umum."
+
+"Kamu bilang tokenomics-nya 'cukup baik'. Apa tepatnya yang membuat kamu bilang itu, dan apa yang bisa bikin kamu ubah penilaian itu?"
+
+"Kalau kamu harus pilih 1 hal yang paling mungkin bikin protokol ini gagal dalam 12 bulan ke depan, apa itu?"</div>
+    </div>
+
+    <div class="box box-tip">
+      <span class="box-label">Simpan Prompt yang Bagus</span>
+      Setiap kali kamu nemu prompt yang hasilnya bagus, simpan di Notion. Lama-lama kamu punya library prompt DeFi sendiri yang bisa dipakai ulang dan dimodifikasi. Ini yang bikin workflow kamu makin efisien seiring waktu.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- CHAPTER 3: RISET PROTOKOL          -->
+  <!-- ═══════════════════════════════════ -->
+  <div id="protokol" class="chapter fade-up">
+    <div class="chapter-label">
+      <span class="chapter-num">03</span>
+      <div class="chapter-line"></div>
+    </div>
+    <h2>Riset Protokol dengan AI</h2>
+    <p class="chapter-sub">Framework sistematis untuk analisis protokol DeFi apapun</p>
+
+    <div class="prose">
+      <p>Setiap kali kamu riset protokol baru, kamu butuh framework yang konsisten supaya analisismu bisa dibandingkan satu sama lain dan nggak ada aspek penting yang kelewat. Ini framework yang bisa kamu pakai.</p>
+    </div>
+
+    <div class="section-title">Framework 6 Dimensi</div>
+
+    <table class="fw-table">
+      <thead>
+        <tr><th>Dimensi</th><th>Yang Perlu Dijawab</th><th>Sumber Data</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Mekanisme</td>
+          <td>Protokol ini bekerja bagaimana? Apa yang unik dibanding kompetitor?</td>
+          <td>Dokumentasi resmi, whitepaper</td>
+        </tr>
+        <tr>
+          <td>Traction</td>
+          <td>Seberapa banyak yang pakai? TVL, volume, user growth?</td>
+          <td>DeFiLlama, Token Terminal</td>
+        </tr>
+        <tr>
+          <td>Revenue</td>
+          <td>Protokol ini dapat uang dari mana? Apakah sustainable?</td>
+          <td>Token Terminal, laporan governance</td>
+        </tr>
+        <tr>
+          <td>Tokenomics</td>
+          <td>Token untuk apa? Supply schedule, vesting, value accrual?</td>
+          <td>Dokumentasi, explorer</td>
+        </tr>
+        <tr>
+          <td>Tim & Governance</td>
+          <td>Siapa yang bangun ini? Sudah terdesentralisasi belum?</td>
+          <td>Website, forum governance</td>
+        </tr>
+        <tr>
+          <td>Risiko</td>
+          <td>Audit oleh siapa? Pernah kena exploit? Dependency ke protokol lain?</td>
+          <td>Audit reports, DeFiLlama hacks</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">Cara Pakainya dengan AI</div>
+
+    <div class="prose">
+      <p>Setelah kamu kumpulkan data dari sumber primer, paste ke AI dengan instruksi yang jelas. Jangan minta AI generate data — minta AI interpretasi data yang sudah ada.</p>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-header">
+        <span class="prompt-label">Template Riset Protokol</span>
+        <span class="prompt-tag">Copy & Pakai</span>
+      </div>
+      <div class="prompt-body">Berikut data yang saya kumpulkan tentang <span class="ph">[nama protokol]</span>:
+
+TVL: <span class="ph">[angka dari DeFiLlama]</span>
+Revenue 30 hari: <span class="ph">[angka dari Token Terminal]</span>
+Jumlah audit: <span class="ph">[dari dokumentasi]</span>
+Token supply: <span class="ph">[total, circulating, locked]</span>
+Kompetitor utama: <span class="ph">[daftar]</span>
+
+Berdasarkan data ini, bantu saya:
+1. Identifikasi kekuatan kompetitif yang sesungguhnya (bukan marketing)
+2. Identifikasi 3 red flag atau risiko yang perlu diteliti lebih dalam
+3. Tentukan apakah revenue model-nya sustainable jangka panjang
+4. Beri overall assessment singkat dalam 2-3 kalimat</div>
+    </div>
+
+    <div class="section-title">Membaca Dokumentasi Protokol</div>
+
+    <div class="prose">
+      <p>Dokumentasi protokol DeFi biasanya panjang dan teknikal. AI bisa sangat membantu di sini — kamu paste bagian dokumentasi yang relevan, minta AI jelaskan dalam bahasa manusia.</p>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-header">
+        <span class="prompt-label">Prompt untuk Baca Docs</span>
+        <span class="prompt-tag">Template</span>
+      </div>
+      <div class="prompt-body">Berikut excerpt dari dokumentasi <span class="ph">[protokol]</span>:
+
+<span class="ph">[paste bagian docs yang membingungkan]</span>
+
+Tolong jelaskan:
+1. Apa yang sebenarnya terjadi secara mekanistik?
+2. Apa implikasinya buat user biasa yang deposit di sini?
+3. Ada risiko tersembunyi yang mungkin nggak obvious dari teks ini?</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- CHAPTER 4: TOKENOMICS              -->
+  <!-- ═══════════════════════════════════ -->
+  <div id="tokenomics" class="chapter fade-up">
+    <div class="chapter-label">
+      <span class="chapter-num">04</span>
+      <div class="chapter-line"></div>
+    </div>
+    <h2>Analisis Tokenomics</h2>
+    <p class="chapter-sub">Cara baca tokenomics suatu protokol dan kenapa ini penting banget</p>
+
+    <div class="prose">
+      <p>Tokenomics adalah "ekonomi" dari sebuah token — bagaimana token itu dibuat, didistribusikan, dipakai, dan pada akhirnya apakah punya nilai nyata atau tidak. Ini salah satu skill paling penting seorang DeFi analyst karena tokenomics yang buruk bisa bikin protokol yang secara teknis bagus pun gagal.</p>
+    </div>
+
+    <div class="section-title">Lima Hal yang Selalu Dicek</div>
+
+    <ul class="step-list">
+      <li>
+        <div class="step-num">1</div>
+        <div>
+          <strong>Supply Schedule</strong><br>
+          <span style="color:var(--muted);font-size:13px">Berapa total token yang akan pernah ada? Berapa yang sudah beredar sekarang? Semakin besar gap antara circulating supply dan total supply, semakin besar potensi dilusi di masa depan. Token yang unlock 70% lagi dalam 2 tahun ke depan artinya ada tekanan jual besar yang akan datang.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div>
+          <strong>Vesting Schedule</strong><br>
+          <span style="color:var(--muted);font-size:13px">Kapan tim dan investor awal boleh jual token mereka? Vesting yang pendek (6 bulan) dan cliff yang kecil adalah red flag — artinya orang dalam bisa dump cepat. Vesting 3–4 tahun dengan cliff 1 tahun lebih meyakinkan bahwa tim committed jangka panjang.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div>
+          <strong>Value Accrual</strong><br>
+          <span style="color:var(--muted);font-size:13px">Kenapa token ini punya nilai? Apakah holder dapat bagian revenue? Atau cuma governance voting yang sebenarnya nggak ngaruh? Token yang hanya punya "governance utility" tanpa cash flow sebenarnya nilainya ditopang oleh spekulasi semata.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">4</div>
+        <div>
+          <strong>Distribusi Awal</strong><br>
+          <span style="color:var(--muted);font-size:13px">Berapa persen ke tim? VC? Community? Kalau tim + VC pegang 60%+ dari supply, itu konsentrasi yang berbahaya — mereka punya terlalu banyak kontrol dan insentif untuk dump. Distribusi yang sehat cenderung lebih banyak ke community dan ecosystem.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">5</div>
+        <div>
+          <strong>FDV vs Market Cap</strong><br>
+          <span style="color:var(--muted);font-size:13px">FDV (Fully Diluted Valuation) = harga token × total supply. Market cap = harga token × circulating supply. Kalau FDV jauh lebih besar dari market cap, artinya masih banyak token yang belum beredar — dan ketika beredar, bisa menekan harga. Rasio FDV/MC yang besar adalah warning sign.</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="section-title">Contoh Scoring Tokenomics</div>
+
+    <div class="prose">
+      <p>Kamu bisa bikin scoring sederhana untuk bandingkan tokenomics antar protokol. Ini versi basic yang bisa kamu modifikasi:</p>
+    </div>
+
+    <div class="score-card">
+      <div class="score-header">
+        Tokenomics Scorecard <span>Skor 0–10 per parameter</span>
+      </div>
+      <div class="score-row">
+        <div class="score-param"><strong>Vesting Schedule</strong> — Apakah tim + investor vesting cukup lama?</div>
+        <div class="score-weight">×1.5</div>
+        <div class="score-bar-wrap"><div class="score-bar bar-green" style="width:80%"></div></div>
+      </div>
+      <div class="score-row">
+        <div class="score-param"><strong>Value Accrual</strong> — Apakah holder dapat revenue nyata?</div>
+        <div class="score-weight">×2.0</div>
+        <div class="score-bar-wrap"><div class="score-bar bar-yellow" style="width:50%"></div></div>
+      </div>
+      <div class="score-row">
+        <div class="score-param"><strong>Distribusi</strong> — Seberapa desentralisasi distribusi awalnya?</div>
+        <div class="score-weight">×1.5</div>
+        <div class="score-bar-wrap"><div class="score-bar bar-green" style="width:70%"></div></div>
+      </div>
+      <div class="score-row">
+        <div class="score-param"><strong>Supply Inflation</strong> — Seberapa cepat supply baru masuk pasar?</div>
+        <div class="score-weight">×1.5</div>
+        <div class="score-bar-wrap"><div class="score-bar bar-red" style="width:30%"></div></div>
+      </div>
+      <div class="score-row">
+        <div class="score-param"><strong>FDV Ratio</strong> — Seberapa besar FDV vs Market Cap saat ini?</div>
+        <div class="score-weight">×1.0</div>
+        <div class="score-bar-wrap"><div class="score-bar bar-yellow" style="width:45%"></div></div>
+      </div>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-header">
+        <span class="prompt-label">Prompt Analisis Tokenomics</span>
+        <span class="prompt-tag">Template</span>
+      </div>
+      <div class="prompt-body">Berikut data tokenomics <span class="ph">[protokol]</span>:
+
+Total supply: <span class="ph">[angka]</span>
+Circulating supply: <span class="ph">[angka]</span>
+Distribusi: Tim <span class="ph">[%]</span>, VC <span class="ph">[%]</span>, Community <span class="ph">[%]</span>, Ecosystem <span class="ph">[%]</span>
+Vesting tim: <span class="ph">[durasi]</span> dengan cliff <span class="ph">[durasi]</span>
+Token utility: <span class="ph">[governance / fee sharing / staking / dll]</span>
+Emisi per bulan: <span class="ph">[angka jika ada]</span>
+
+Analisis tokenomics ini. Identifikasi:
+1. Apakah ada insentif misalignment antara tim dan pengguna?
+2. Berapa tekanan jual yang bisa terjadi dalam 12 bulan ke depan?
+3. Apakah value accrual ke token holder nyata atau hanya governance?
+4. Overall rating tokenomics: Kuat / Sedang / Lemah, beserta alasannya</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- CHAPTER 5: RISK ASSESSMENT         -->
+  <!-- ═══════════════════════════════════ -->
+  <div id="risk" class="chapter fade-up">
+    <div class="chapter-label">
+      <span class="chapter-num">05</span>
+      <div class="chapter-line"></div>
+    </div>
+    <h2>Risk Assessment dengan AI</h2>
+    <p class="chapter-sub">Cara identifikasi dan kuantifikasi risiko protokol secara sistematis</p>
+
+    <div class="prose">
+      <p>Salah satu skill paling berharga seorang DeFi analyst adalah kemampuan identifikasi risiko yang nggak obvious. AI bisa sangat membantu di sini — bukan untuk kasih jawaban final, tapi untuk bantu kamu berpikir lebih sistematis dan nggak kelewat aspek penting.</p>
+    </div>
+
+    <div class="section-title">Kategori Risiko yang Harus Selalu Dicek</div>
+
+    <table class="fw-table">
+      <thead>
+        <tr><th>Kategori</th><th>Pertanyaan Kunci</th><th>Cara Cek</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Smart Contract</td>
+          <td>Sudah audit berapa kali? Oleh siapa? Ada bug bounty?</td>
+          <td>Docs protokol, Immunefi</td>
+        </tr>
+        <tr>
+          <td>Oracle</td>
+          <td>Pakai oracle apa? Berapa banyak sumber harga? Pernah kena manipulasi?</td>
+          <td>Docs teknikal protokol</td>
+        </tr>
+        <tr>
+          <td>Centralization</td>
+          <td>Siapa yang pegang admin key? Bisa upgrade kontrak sepihak?</td>
+          <td>Etherscan, docs governance</td>
+        </tr>
+        <tr>
+          <td>Dependency</td>
+          <td>Protokol ini bergantung ke protokol lain? Kalau yang itu kena hack, apa dampaknya?</td>
+          <td>Docs teknikal, community</td>
+        </tr>
+        <tr>
+          <td>Liquidity</td>
+          <td>Seberapa dalam likuiditasnya? Kalau 20% LP keluar sekarang, apa yang terjadi?</td>
+          <td>DeFiLlama, Dune</td>
+        </tr>
+        <tr>
+          <td>Regulatory</td>
+          <td>Ada risiko protokol ini kena regulasi? Tim berdomisili di mana?</td>
+          <td>Website tim, berita terkini</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">Red Flag yang Langsung Harus Waspada</div>
+
+    <div class="box box-warning">
+      <span class="box-label">Red Flags — Pertimbangkan Keluar atau Skip</span>
+      <ul style="list-style:none;margin-top:4px">
+        <li style="padding:4px 0;display:flex;gap:8px"><span>⚠</span><span>Tim anonim + protokol baru + APY sangat tinggi = kombinasi paling berbahaya di DeFi</span></li>
+        <li style="padding:4px 0;display:flex;gap:8px"><span>⚠</span><span>Admin key yang belum di-renounce artinya tim masih bisa ubah kontrak sepihak kapan saja</span></li>
+        <li style="padding:4px 0;display:flex;gap:8px"><span>⚠</span><span>Audit oleh firma yang nggak dikenal atau audit cuma 1 kali untuk protokol yang handle miliaran dolar</span></li>
+        <li style="padding:4px 0;display:flex;gap:8px"><span>⚠</span><span>TVL naik terlalu cepat dalam waktu singkat — sering berarti likuiditas mercenary yang akan pergi secepat datangnya</span></li>
+        <li style="padding:4px 0;display:flex;gap:8px"><span>⚠</span><span>Dokumentasi yang minimalis atau sangat teknikal tanpa penjelasan risk untuk user — ini tanda tim nggak transparan</span></li>
+      </ul>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-header">
+        <span class="prompt-label">Prompt Risk Assessment</span>
+        <span class="prompt-tag">Template</span>
+      </div>
+      <div class="prompt-body">Lakukan risk assessment untuk <span class="ph">[protokol]</span> berdasarkan informasi berikut:
+
+<span class="ph">[paste info yang kamu kumpulkan: audit, tim, TVL history, dependency, dll]</span>
+
+Format output:
+**RISIKO KRITIS** (bisa bikin dana hilang 100%)
+**RISIKO SEDANG** (bisa signifikan tapi manageable)  
+**RISIKO RENDAH** (perlu dimonitor tapi nggak urgent)
+**MITIGASI** (apa yang bisa dilakukan untuk kurangi setiap risiko)
+**OVERALL RISK SCORE**: Rendah / Sedang / Tinggi / Sangat Tinggi</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- CHAPTER 6: ON-CHAIN BASICS         -->
+  <!-- ═══════════════════════════════════ -->
+  <div id="onchain" class="chapter fade-up">
+    <div class="chapter-label">
+      <span class="chapter-num">06</span>
+      <div class="chapter-line"></div>
+    </div>
+    <h2>On-Chain Data Basics</h2>
+    <p class="chapter-sub">Baca data blockchain tanpa harus jadi programmer dulu</p>
+
+    <div class="prose">
+      <p>Semua transaksi di blockchain itu publik dan bisa dibaca siapapun. Ini keunggulan DeFi dibanding finance tradisional — kamu bisa verifikasi sendiri apa yang terjadi tanpa percaya laporan perusahaan. Tapi datanya banyak dan butuh tool yang tepat.</p>
+    </div>
+
+    <div class="section-title">Tool Utama untuk On-Chain Data</div>
+
+    <div class="term-grid">
+      <div class="term-card">
+        <div class="term-name">DeFiLlama</div>
+        <div class="term-def">Dashboard TVL, revenue, fees untuk semua protokol DeFi. Gratis, real-time, dan sangat lengkap. Ini first stop kamu untuk data makro protokol.</div>
+      </div>
+      <div class="term-card">
+        <div class="term-name">Token Terminal</div>
+        <div class="term-def">Fokus ke metrics finansial protokol: revenue, P/S ratio, user growth. Bagus untuk bandingkan valuasi antar protokol seperti analisis saham.</div>
+      </div>
+      <div class="term-card">
+        <div class="term-name">Dune Analytics</div>
+        <div class="term-def">Query langsung ke data blockchain pakai SQL. Lebih teknikal, tapi ada ribuan dashboard publik yang sudah dibuat orang lain yang bisa kamu fork dan pakai.</div>
+      </div>
+      <div class="term-card">
+        <div class="term-name">Etherscan / Block Explorer</div>
+        <div class="term-def">Lihat detail transaksi, wallet, dan smart contract di level paling dasar. Bisa cek apakah admin key sudah di-renounce atau belum dari sini.</div>
+      </div>
+      <div class="term-card">
+        <div class="term-name">Nansen</div>
+        <div class="term-def">Wallet intelligence — lihat apa yang dilakukan "smart money" (whale, VC, protocol treasuries). Berbayar tapi sangat powerful untuk identifikasi early moves.</div>
+      </div>
+      <div class="term-card">
+        <div class="term-name">Arkham Intelligence</div>
+        <div class="term-def">Identifikasi siapa pemilik wallet. Berguna untuk track treasury protokol, whale tertentu, atau exchange flows.</div>
+      </div>
+    </div>
+
+    <div class="section-title">Metrics yang Harus Kamu Pahami</div>
+
+    <table class="fw-table">
+      <thead>
+        <tr><th>Metric</th><th>Artinya</th><th>Interpretasi</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>TVL</td>
+          <td>Total aset yang terkunci di protokol</td>
+          <td>Naik = kepercayaan tumbuh. Turun tajam = ada sesuatu yang salah atau insentif habis</td>
+        </tr>
+        <tr>
+          <td>Volume/TVL</td>
+          <td>Seberapa aktif likuiditas digunakan</td>
+          <td>Tinggi = likuiditas efisien. Rendah = banyak modal nganggur</td>
+        </tr>
+        <tr>
+          <td>Protocol Revenue</td>
+          <td>Uang yang masuk ke protokol (bukan LP)</td>
+          <td>Ini ukuran bisnis yang sebenarnya, bukan TVL</td>
+        </tr>
+        <tr>
+          <td>P/S Ratio</td>
+          <td>Market cap dibagi annual revenue</td>
+          <td>Seperti P/E di saham. Makin rendah = makin "murah" relatif terhadap revenue</td>
+        </tr>
+        <tr>
+          <td>Unique Wallets</td>
+          <td>Jumlah alamat berbeda yang pakai protokol</td>
+          <td>Proxy untuk user growth yang lebih susah dimanipulasi dibanding TVL</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="box box-analogy">
+      <span class="box-label">Cara Pakai AI untuk Interpretasi Data</span>
+      Setelah kamu kumpulkan angka-angka ini dari DeFiLlama atau Token Terminal, screenshot atau copy tabelnya, paste ke Claude, dan tanya: "Apa yang data ini ceritakan tentang kesehatan protokol ini? Ada anomali yang perlu diteliti lebih lanjut?" AI bagus untuk temukan pola yang mungkin kamu lewatkan.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- CHAPTER 7: OUTPUT FORMAT           -->
+  <!-- ═══════════════════════════════════ -->
+  <div id="output" class="chapter fade-up">
+    <div class="chapter-label">
+      <span class="chapter-num">07</span>
+      <div class="chapter-line"></div>
+    </div>
+    <h2>Membuat Research Report</h2>
+    <p class="chapter-sub">Format standar riset DeFi yang bisa langsung dipublish</p>
+
+    <div class="prose">
+      <p>Output akhir dari semua analisis yang sudah kamu lakukan adalah sebuah research report yang bisa dibaca orang lain. Ini yang akan membangun reputasi kamu sebagai analyst. Format yang baik bukan soal panjang — tapi soal struktur yang jelas dan mudah diikuti pembaca.</p>
+    </div>
+
+    <div class="section-title">Struktur Research Report Standar</div>
+
+    <ul class="step-list">
+      <li>
+        <div class="step-num">1</div>
+        <div>
+          <strong>Executive Summary</strong> (2–3 paragraf)<br>
+          <span style="color:var(--muted);font-size:13px">Apa protokolnya, apa temuan utama kamu, dan apa kesimpulan akhirnya. Ditulis terakhir tapi diletakkan pertama. Pembaca yang sibuk hanya baca bagian ini.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div>
+          <strong>Protocol Overview</strong><br>
+          <span style="color:var(--muted);font-size:13px">Mekanisme utama, apa yang membuat protokol ini ada, siapa target penggunanya. Jelaskan seperti kamu jelasin ke orang yang belum pernah dengar protokol ini.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div>
+          <strong>Traction & Financials</strong><br>
+          <span style="color:var(--muted);font-size:13px">TVL, volume, revenue, user growth. Sertakan chart atau angka konkret. Ini bagian yang paling bisa diverifikasi pembaca, jadi harus akurat.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">4</div>
+        <div>
+          <strong>Tokenomics Analysis</strong><br>
+          <span style="color:var(--muted);font-size:13px">Supply, distribusi, vesting, value accrual. Gunakan framework yang sudah kamu pelajari di chapter sebelumnya.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">5</div>
+        <div>
+          <strong>Risk Factors</strong><br>
+          <span style="color:var(--muted);font-size:13px">Sebutkan risiko spesifik, bukan generic. "Smart contract risk" saja nggak cukup — sebutkan kontrak mana yang belum diaudit atau memiliki admin key aktif.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">6</div>
+        <div>
+          <strong>Outlook & Catalysts</strong><br>
+          <span style="color:var(--muted);font-size:13px">Apa yang bisa mendorong pertumbuhan protokol ini? Upgrade apa yang sedang dikerjakan? Narasi besar apa yang mendukung atau mengancamnya?</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="prompt-block">
+      <div class="prompt-header">
+        <span class="prompt-label">Prompt Draft Report</span>
+        <span class="prompt-tag">Template Final</span>
+      </div>
+      <div class="prompt-body">Berikut semua poin analisis yang sudah saya kumpulkan tentang <span class="ph">[protokol]</span>:
+
+<span class="ph">[paste semua catatan riset kamu]</span>
+
+Tolong bantu saya draft research report dengan struktur berikut:
+1. Executive Summary (3 paragraf, bahasa mudah dipahami)
+2. Protocol Overview (mekanisme dan keunikan)
+3. Traction & Financials (pakai angka yang sudah saya kasih)
+4. Tokenomics Analysis
+5. Risk Factors (spesifik, bukan generic)
+6. Outlook
+
+Gaya penulisan: informatif, langsung ke poin, hindari hype. Target pembaca: DeFi enthusiast yang paham dasar tapi belum familiar dengan protokol ini. Panjang total: 800–1200 kata.</div>
+    </div>
+
+    <div class="box box-tip">
+      <span class="box-label">Dimana Publish?</span>
+      <strong>Mirror.xyz</strong> — platform publish on-chain, cocok untuk DeFi audience dan bisa collect NFT. <strong>Substack</strong> — kalau mau bangun email subscriber. <strong>Twitter/X Thread</strong> — untuk reach yang lebih luas dengan format yang lebih pendek. Mulai dari salah satu, konsisten, baru ekspansi ke platform lain.
+    </div>
+
+    <div class="box box-warning">
+      <span class="box-label">Selalu Sertakan Disclaimer</span>
+      Setiap report kamu harus ada disclaimer bahwa ini bukan financial advice, kamu mungkin punya posisi di protokol yang dianalisis, dan pembaca harus DYOR. Ini bukan formalitas — ini perlindungan hukum dan etika dasar analyst.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- RECAP -->
+  <div class="recap fade-up">
+    <h3>Rangkuman Fase 1</h3>
+    <ul>
+      <li>AI adalah partner riset, bukan oracle — selalu verifikasi angka ke sumber primer</li>
+      <li>Prompt yang baik = konteks jelas + role + format yang diminta + push back kalau perlu</li>
+      <li>Riset protokol pakai framework 6 dimensi: mekanisme, traction, revenue, tokenomics, tim, risiko</li>
+      <li>Tokenomics yang bagus punya value accrual nyata, vesting panjang, dan distribusi yang wajar</li>
+      <li>FDV jauh lebih besar dari market cap = potensi tekanan jual besar di masa depan</li>
+      <li>Risk assessment harus spesifik — bukan "ada smart contract risk" tapi kontrak mana dan kenapa</li>
+      <li>On-chain data bisa dibaca siapapun — DeFiLlama, Token Terminal, Dune adalah toolkit wajib</li>
+      <li>Research report yang baik punya struktur jelas dan ditulis untuk pembaca, bukan untuk diri sendiri</li>
+    </ul>
+  </div>
+
+  <!-- NEXT -->
+  <div style="margin-top:32px">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px">Selanjutnya</div>
+    <div class="next-card">
+      <div>
+        <div class="label">Fase 2</div>
+        <div class="title">Tools & Workflow Hybrid — DeFiLlama, Dune, dan AI Analyst Workflow</div>
+      </div>
+      <div class="arrow">→</div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>Bagian dari <strong>AI-Powered DeFi Analyst Course</strong> — Ditulis oleh <strong>Chloe</strong> untuk Cerulean</p>
+  <p style="margin-top:6px;font-size:11px">Bukan financial advice. Semua contoh untuk ilustrasi.</p>
+</footer>
+
+<script>
+  const sections = ['mindset','prompt','protokol','tokenomics','risk','onchain','output'];
+  const btns = document.querySelectorAll('.toc-btn');
+
+  window.addEventListener('scroll', () => {
+    let current = sections[0];
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top < 140) current = id;
+    });
+    btns.forEach((btn, i) => btn.classList.toggle('active', sections[i] === current));
+  });
+
+  function navTo(id) {
+    document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  const faders = document.querySelectorAll('.fade-up');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  faders.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
